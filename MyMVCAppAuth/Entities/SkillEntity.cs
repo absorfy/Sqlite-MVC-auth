@@ -17,5 +17,8 @@ public class SkillEntity
     [Range(1, 10)]
     public int Level { get; set; }
     
+    [Required]
+    public DateTime CreatedAt { get; set; }
+    
     public ICollection<HeroEntity> Heroes { get; set; }
 }

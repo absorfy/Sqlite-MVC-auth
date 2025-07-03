@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyMVCApp.Mappers;
 using MyMVCApp.Models;
 using MyMVCAppAuth.Data;
+using MyMVCAppAuth.Mappers;
 
 namespace MyMVCAppAuth.Controllers
 {
@@ -95,7 +95,9 @@ namespace MyMVCAppAuth.Controllers
             {
                 try
                 {
-                    _context.Update(SkillMapper.ToEntity(skillViewModel, await _context.Heroes.ToListAsync()));
+                    var oldSkill = await _context.GetSkillById(skillViewModel.Id);
+                    if(oldSkill == null) return NotFound(); 
+                    SkillMapper.ToEntity(oldSkill, skillViewModel, await _context.Heroes.ToListAsync());
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

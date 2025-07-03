@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyMVCApp.Mappers;
 using MyMVCApp.Models;
 using MyMVCAppAuth.Data;
+using MyMVCAppAuth.Mappers;
 
 namespace MyMVCAppAuth.Controllers
 {
@@ -50,8 +50,13 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,HeroIds")] ClassViewModel classViewModel)
+        public async Task<IActionResult> Create(int id, [Bind("Id,Name,Description,HeroIds")] ClassViewModel classViewModel)
         {
+            if (id != classViewModel.Id)
+            {
+                return NotFound();
+            }
+            
             await CheckUniqueError(classViewModel);
             if (ModelState.IsValid)
             {
@@ -95,7 +100,9 @@ namespace MyMVCAppAuth.Controllers
             {
                 try
                 {
-                    _context.Update(ClassMapper.ToEntity(classViewModel, await _context.Heroes.ToListAsync()));
+                    var oldClass = await _context.GetClassById(classViewModel.Id);
+                    if (oldClass == null) return NotFound();
+                    ClassMapper.ToEntity(oldClass, classViewModel, await _context.Heroes.ToListAsync());
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

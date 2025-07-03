@@ -43,24 +43,40 @@ public class ApplicationDbContext : IdentityDbContext
         base.OnModelCreating(modelBuilder);
     }
     
-    public Task<List<HeroEntity>> GetHeroesAsync()
+    public Task<List<HeroEntity>> GetHeroesAsync() =>
+        Heroes
+            .Include(h => h.Class)
+            .Include(h => h.Skills).ToListAsync();
+
+    public Task<List<ClassEntity>> GetClassesAsync() =>
+        Classes
+            .Include(c => c.Heroes)
+            .ToListAsync();
+
+    public Task<List<SkillEntity>> GetSkillsAsync() =>
+        Skills
+            .Include(s => s.Heroes)
+            .ToListAsync();
+
+    public Task<HeroEntity?> GetHeroById(int id)
     {
         return Heroes
             .Include(h => h.Class)
-            .Include(h => h.Skills).ToListAsync();
+            .Include(h => h.Skills)
+            .FirstOrDefaultAsync(h => h.Id == id);
     }
 
-    public Task<List<ClassEntity>> GetClassesAsync()
+    public Task<ClassEntity?> GetClassById(int id)
     {
         return Classes
             .Include(c => c.Heroes)
-            .ToListAsync();
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
-    
-    public Task<List<SkillEntity>> GetSkillsAsync()
+
+    public Task<SkillEntity?> GetSkillById(int id)
     {
         return Skills
             .Include(s => s.Heroes)
-            .ToListAsync();
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 }

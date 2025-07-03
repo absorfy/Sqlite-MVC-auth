@@ -14,6 +14,9 @@ public class ClassEntity
     public string Name { get; set; }
     
     [Required]
+    public DateTime CreatedAt { get; set; }
+    
+    [Required]
     [StringLength(200, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 200 characters.")]
     public string Description { get; set; }
     

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MyMVCApp.Mappers;
 using MyMVCAppAuth.Data;
 using MyMVCAppAuth.Entities;
+using MyMVCAppAuth.Mappers;
 using MyMVCAppAuth.Models;
 
 namespace MyMVCAppAuth.Controllers
@@ -18,12 +18,45 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Heroes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(PaginateViewModel paginateViewModel)
         {
-            var heroes = await _context.GetHeroesAsync();
-            PutClassesToViewData(heroes.ToArray());
-            PutSkillsToViewData(heroes.ToArray());
-            return View(heroes.Select(HeroMapper.ToViewModel).ToList());
+            var allHeroes = await _context.GetHeroesAsync();
+
+            // Сортування
+            IEnumerable<HeroEntity> sortedHeroes = paginateViewModel.OrderBy switch
+            {
+                HeroesOrderByEnum.Name => paginateViewModel.IsAscending
+                    ? allHeroes.OrderBy(h => h.Name)
+                    : allHeroes.OrderByDescending(h => h.Name),
+
+                HeroesOrderByEnum.CreatedAt => paginateViewModel.IsAscending
+                    ? allHeroes.OrderBy(h => h.CreatedAt)
+                    : allHeroes.OrderByDescending(h => h.CreatedAt),
+
+                _ => allHeroes
+            };
+
+            // Загальна кількість
+            paginateViewModel.TotalCount = sortedHeroes.Count();
+
+            // Кількість сторінок
+            paginateViewModel.TotalPages = (int)Math.Ceiling((double)paginateViewModel.TotalCount / paginateViewModel.PageSize);
+
+            // Отримання потрібної сторінки
+            var paginatedHeroes = sortedHeroes
+                .Skip(paginateViewModel.Page * paginateViewModel.PageSize)
+                .Take(paginateViewModel.PageSize)
+                .ToList();
+
+            // Дані у ViewData
+            PutClassesToViewData(paginatedHeroes.ToArray());
+            PutSkillsToViewData(paginatedHeroes.ToArray());
+
+            // Передача пагінації у View
+            ViewBag.Pagination = paginateViewModel;
+
+            // Повернення View з ViewModel-ами
+            return View(paginatedHeroes.Select(HeroMapper.ToViewModel).ToList());
         }
 
         // GET: Heroes/Details/5
@@ -47,7 +80,7 @@ namespace MyMVCAppAuth.Controllers
 
         private void PutClassesToViewData(params HeroEntity[] heroes)
         {
-            var classes = heroes.Select(h => ClassMapper.ToViewModel(h.Class)).ToList();
+            var classes = heroes.Select(h => h.Class != null ? ClassMapper.ToViewModel(h.Class) : null).ToList();
             ViewData["Classes"] = classes;
         }
         
@@ -106,8 +139,8 @@ namespace MyMVCAppAuth.Controllers
             PutSkillsForSelect();
             return View(model);
         }
-        
-        private async Task TrySaveHeroImage(HeroViewModel model)
+
+        public async Task TrySaveHeroImage(HeroViewModel model)
         {
             if (model.HeroImageFile != null)
             {
@@ -124,9 +157,7 @@ namespace MyMVCAppAuth.Controllers
         {
             var hero = (await _context.GetHeroesAsync()).Find(h => h.Id == id);
             if (hero == null)
-            {
                 return NotFound();
-            }
         
             PutClassesForSelect(hero.Class);
             PutSkillsForSelect(hero.Skills.ToArray());
@@ -138,14 +169,22 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Name,ClassId,ImageUrl,HeroImageFile,SkillIds")] HeroViewModel model)
+        public async Task<IActionResult> Edit(int id,
+            [Bind("Id,Name,ClassId,ImageUrl,HeroImageFile,SkillIds")] HeroViewModel model)
         {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+            
             if (ModelState.IsValid)
             {
                 try
                 {
                     await TrySaveHeroImage(model);
-                    _context.Update(HeroMapper.ToEntity(model));
+                    var oldHero = await _context.GetHeroById(model.Id);
+                    if(oldHero == null) return NotFound();
+                    HeroMapper.ToEntity(oldHero, model, await _context.Skills.ToListAsync());
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -154,15 +193,13 @@ namespace MyMVCAppAuth.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
 
                 return RedirectToAction("Index");
             }
-            
+
             await PutClassesForSelect(model.ClassId);
             await PutSkillsForSelect(model.SkillIds);
             return View(model);
@@ -172,15 +209,11 @@ namespace MyMVCAppAuth.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var heroEntity = (await _context.GetHeroesAsync()).FirstOrDefault(m => m.Id == id);
             if (heroEntity == null)
-            {
                 return NotFound();
-            }
 
             PutClassesToViewData();
             PutSkillsToViewData();
@@ -193,11 +226,11 @@ namespace MyMVCAppAuth.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var heroEntity = await _context.Heroes.FindAsync(id);
-            if (heroEntity != null)
-            {
-                _context.Heroes.Remove(heroEntity);
-                await _context.SaveChangesAsync();
-            }
+            if (heroEntity == null) 
+                return RedirectToAction(nameof(Index));
+            
+            _context.Heroes.Remove(heroEntity);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

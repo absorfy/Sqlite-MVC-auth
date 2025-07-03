@@ -1,0 +1,50 @@
+@model MyMVCAppAuth.Models.HeroViewModel
+@{
+    var classMap = ViewData["ClassMap"] as Dictionary<int, string>;
+    var skillMap = ViewData["SkillMap"] as Dictionary<int, string>;
+}
+
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>HeroEntity</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ImageUrl)
+        </dt>
+        <dd class = "col-sm-10">
+            @await Html.PartialAsync("_HeroAvatar", Model)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ClassId)
+        </dt>
+        <dd class = "col-sm-10">
+            @await Html.PartialAsync("_DisplayHeroClass", Model)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SkillIds)
+        </dt>
+        <dd class = "col-sm-10">
+            @await Html.PartialAsync("_DisplayHeroSkills", Model)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

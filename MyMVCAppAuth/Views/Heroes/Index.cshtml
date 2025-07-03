@@ -1,0 +1,39 @@
+@model IEnumerable<MyMVCAppAuth.Models.HeroViewModel>
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.ImageUrl)</th>
+            <th>@Html.DisplayNameFor(model => model.ClassId)</th>
+            <th>@Html.DisplayNameFor(model => model.SkillIds)</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var hero in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => hero.Name)</td>
+            <td>
+                @await Html.PartialAsync("_HeroAvatar", hero)
+            </td>
+            <td>
+                @await Html.PartialAsync("_DisplayHeroClass", hero)
+            </td>
+            <td>
+                @await Html.PartialAsync("_DisplayHeroSkills", hero)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@hero.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@hero.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@hero.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,8 @@
+﻿@using MyMVCApp.Models
+@model HeroViewModel
+@{
+    var classes = ViewData["Classes"] as List<ClassViewModel>;
+}
+
+@(classes?.Find(c => c.HeroIds.Contains(Model.Id))?.Name ?? "Клас не знайдено")
+

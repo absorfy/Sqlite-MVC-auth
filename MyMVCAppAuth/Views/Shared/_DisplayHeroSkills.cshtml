@@ -1,0 +1,19 @@
+﻿@using MyMVCApp.Models
+@model HeroViewModel
+
+@{
+    var skills = ViewData["Skills"] as List<SkillViewModel>;
+}
+
+@{
+    var selectedSkills = skills?.Where(skill => Model.SkillIds.Contains(skill.Id)).Select(skill => skill.Name).ToList();
+}
+@if (selectedSkills != null && selectedSkills.Any())
+{
+    @string.Join(", ", selectedSkills)
+}
+else
+{
+    <span>Жодних скілів</span>
+}
+

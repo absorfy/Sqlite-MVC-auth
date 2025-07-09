@@ -7,7 +7,7 @@ using MyMVCAppAuth.Data;
 
 #nullable disable
 
-namespace MyMVCAppAuth.Data.Migrations
+namespace MyMVCAppAuth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -310,6 +310,19 @@ namespace MyMVCAppAuth.Data.Migrations
                     b.ToTable("Skills");
                 });
 
+            modelBuilder.Entity("MyMVCAppAuth.Entities.UserProfileEntity", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserProfiles");
+                });
+
             modelBuilder.Entity("HeroEntitySkillEntity", b =>
                 {
                     b.HasOne("MyMVCAppAuth.Entities.HeroEntity", null)
@@ -385,6 +398,17 @@ namespace MyMVCAppAuth.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Class");
+                });
+
+            modelBuilder.Entity("MyMVCAppAuth.Entities.UserProfileEntity", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MyMVCAppAuth.Entities.ClassEntity", b =>

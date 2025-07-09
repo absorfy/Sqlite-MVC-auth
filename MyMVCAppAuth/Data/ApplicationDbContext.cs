@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyMVCAppAuth.Entities;
 
@@ -6,6 +7,7 @@ namespace MyMVCAppAuth.Data;
 
 public class ApplicationDbContext : IdentityDbContext
 {
+    public DbSet<UserProfileEntity> UserProfiles { get; set; }
     public DbSet<HeroEntity> Heroes { get; set; }
     public DbSet<ClassEntity> Classes { get; set; }
     public DbSet<SkillEntity> Skills { get; set; }
@@ -39,6 +41,15 @@ public class ApplicationDbContext : IdentityDbContext
             .HasMany(s => s.Heroes)
             .WithMany(h => h.Skills)
             .UsingEntity(j => j.ToTable("HeroSkills"));
+
+        // modelBuilder.Entity<UserProfileEntity>()
+        //     .HasKey(up => up.UserId);
+        //
+        // modelBuilder.Entity<UserProfileEntity>()
+        //     .HasOne<IdentityUser>(up => up.User)
+        //     .WithOne()
+        //     .HasForeignKey<UserProfileEntity>(up => up.UserId)
+        //     .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

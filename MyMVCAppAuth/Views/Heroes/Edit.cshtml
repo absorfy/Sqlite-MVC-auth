@@ -26,8 +26,9 @@
                 <span asp-validation-for="ClassId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                @await Html.PartialAsync("_HeroAvatar", Model)
                 <label asp-for="HeroImageFile" class="control-label"></label>
+                @await Html.PartialAsync("_HeroAvatar", Model)
+                <input type="file" asp-for="HeroImageFile" class="form-control"/>
             </div>
             <div>
                 <label asp-for="SkillIds"></label><br/>

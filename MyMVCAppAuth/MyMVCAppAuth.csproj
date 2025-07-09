@@ -21,4 +21,12 @@
       <Folder Include="wwwroot\images\heroes\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\DateOfBirth.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\Email.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ViewImports.cshtml" />
+    </ItemGroup>
+
 </Project>

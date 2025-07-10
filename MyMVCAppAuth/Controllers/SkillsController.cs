@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyMVCApp.Models;
@@ -40,6 +41,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Skills/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new SkillViewModel());
@@ -50,6 +52,7 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Level")] SkillViewModel skillViewModel)
         {
             await CheckUniqueError(skillViewModel);
@@ -63,6 +66,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Skills/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,6 +87,7 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Level")] SkillViewModel skillViewModel)
         {
             if (id != skillViewModel.Id)
@@ -117,6 +122,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Skills/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,6 +141,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // POST: Skills/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

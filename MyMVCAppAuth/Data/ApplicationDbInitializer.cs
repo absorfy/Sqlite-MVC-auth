@@ -2,7 +2,7 @@
 
 namespace MyMVCAppAuth.Data;
 
-public static class DbInitializer
+public static class ApplicationDbInitializer
 {
     public static void Seed(ApplicationDbContext context)
     {

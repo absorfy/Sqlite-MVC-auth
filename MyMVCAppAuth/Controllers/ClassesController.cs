@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyMVCApp.Models;
@@ -40,6 +41,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Classes/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new ClassViewModel());
@@ -50,6 +52,7 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(int id, [Bind("Id,Name,Description,HeroIds")] ClassViewModel classViewModel)
         {
             if (id != classViewModel.Id)
@@ -68,6 +71,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Classes/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -88,6 +92,7 @@ namespace MyMVCAppAuth.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,HeroIds")] ClassViewModel classViewModel)
         {
             if (id != classViewModel.Id)
@@ -122,6 +127,7 @@ namespace MyMVCAppAuth.Controllers
         }
 
         // GET: Classes/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,6 +148,7 @@ namespace MyMVCAppAuth.Controllers
         // POST: Classes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var classEntity = await _context.Classes.FindAsync(id);
